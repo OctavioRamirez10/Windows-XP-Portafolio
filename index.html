@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows XP Portfolio - Octavio Ramirez</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Tahoma', 'Arial', sans-serif;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        /* Windows XP Background */
+        .desktop {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(180deg, 
+                #87ceeb 0%,
+                #5eb3e4 8%,
+                #4682b4 18%,
+                #2e7dd1 28%,
+                #245edb 38%,
+                #1a5490 48%,
+                #4fa8f5 55%,
+                #6dc4e8 62%,
+                #78cce0 68%,
+                #8fd4a8 75%,
+                #7bc788 82%,
+                #6ab878 88%,
+                #5eaa68 92%,
+                #58a05c 95%,
+                #4a8a4e 98%,
+                #3d7a42 100%
+            );
+            overflow: hidden;
+        }
+
+        /* Desktop Icons */
+        .desktop-icons {
+            position: absolute;
+            inset: 0;
+            padding: 20px;
+        }
+
+        .desktop-icon {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .desktop-icon:hover {
+            background: rgba(0, 100, 255, 0.3);
+        }
+
+        .desktop-icon.selected {
+            background: rgba(0, 100, 255, 0.5);
+            border: 1px solid #0066ff;
+        }
+
+        .desktop-icon .icon {
+            font-size: 32px;
+            margin-bottom: 4px;
+        }
+
+        .desktop-icon .label {
+            font-size: 11px;
+            color: white;
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+
+        /* Taskbar */
+        .taskbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: linear-gradient(180deg, #c0c0c0 0%, #808080 100%);
+            border-top: 2px solid #fff;
+            display: flex;
+            align-items: center;
+            padding: 0 4px;
+            z-index: 1000;
+        }
+
+        .start-button {
+            width: 80px;
+            height: 32px;
+            background: linear-gradient(180deg, #4e8f2e 0%, #2d5a0d 100%);
+            border: 2px solid #000;
+            border-right-color: #fff;
+            border-bottom-color: #fff;
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            gap: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+            font-size: 14px;
+            margin-right: 8px;
+        }
+
+        .start-button:active {
+            border: 2px solid #fff;
+            border-right-color: #000;
+            border-bottom-color: #000;
+        }
+
+        .taskbar-apps {
+            flex: 1;
+            display: flex;
+            gap: 2px;
+        }
+
+        .taskbar-app {
+            height: 28px;
+            background: #c0c0c0;
+            border: 2px solid #000;
+            border-right-color: #fff;
+            border-bottom-color: #fff;
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            gap: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            min-width: 120px;
+        }
+
+        .taskbar-app.active {
+            background: #a0a0a0;
+            border: 2px solid #fff;
+            border-right-color: #000;
+            border-bottom-color: #000;
+        }
+
+        .system-tray {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 8px;
+            font-size: 11px;
+        }
+
+        /* Window */
+        .window {
+            position: absolute;
+            background: #c0c0c0;
+            border: 2px solid #000;
+            border-right-color: #fff;
+            border-bottom-color: #fff;
+            min-width: 300px;
+            min-height: 200px;
+            display: none;
+            flex-direction: column;
+        }
+
+        .window.active {
+            display: flex;
+            z-index: 100;
+        }
+
+        .window.maximized {
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 40px !important;
+            width: auto !important;
+            height: auto !important;
+        }
+
+        .window-header {
+            background: linear-gradient(180deg, #0055ee 0%, #003399 100%);
+            height: 30px;
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            gap: 8px;
+            cursor: move;
+        }
+
+        .window-icon {
+            font-size: 16px;
+        }
+
+        .window-title {
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            flex: 1;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 2px;
+        }
+
+        .window-button {
+            width: 16px;
+            height: 14px;
+            background: #c0c0c0;
+            border: 1px solid #000;
+            border-right-color: #fff;
+            border-bottom-color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        .window-button:active {
+            border: 1px solid #fff;
+            border-right-color: #000;
+            border-bottom-color: #000;
+        }
+
+        .window-content {
+            flex: 1;
+            background: white;
+            padding: 16px;
+            overflow: auto;
+        }
+
+        /* Start Menu */
+        .start-menu {
+            position: absolute;
+            bottom: 42px;
+            left: 0;
+            width: 250px;
+            height: 400px;
+            background: #c0c0c0;
+            border: 2px solid #000;
+            border-right-color: #fff;
+            border-bottom-color: #fff;
+            display: none;
+            flex-direction: column;
+            z-index: 1001;
+        }
+
+        .start-menu.active {
+            display: flex;
+        }
+
+        .start-menu-header {
+            background: linear-gradient(180deg, #0055ee 0%, #003399 100%);
+            height: 60px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 12px;
+        }
+
+        .start-menu-user {
+            width: 40px;
+            height: 40px;
+            background: #fff;
+            border: 2px solid #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .start-menu-info {
+            color: white;
+            font-size: 11px;
+        }
+
+        .start-menu-content {
+            flex: 1;
+            display: flex;
+        }
+
+        .start-menu-programs {
+            flex: 1;
+            padding: 8px;
+        }
+
+        .start-menu-item {
+            display: flex;
+            align-items: center;
+            padding: 4px 8px;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .start-menu-item:hover {
+            background: #0055ee;
+            color: white;
+        }
+
+        .start-menu-sidebar {
+            width: 180px;
+            background: linear-gradient(180deg, #808080 0%, #606060 100%);
+            padding: 8px;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .desktop-icons {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 16px;
+                padding: 16px;
+            }
+
+            .desktop-icon {
+                position: relative !important;
+                width: 100%;
+                height: 80px;
+            }
+
+            .window {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 40px !important;
+                width: auto !important;
+                height: auto !important;
+            }
+
+            .taskbar {
+                height: 50px;
+            }
+
+            .start-button {
+                width: 60px;
+                font-size: 12px;
+            }
+
+            .taskbar-app {
+                min-width: 80px;
+                font-size: 10px;
+            }
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            inset: 0;
+            background: black;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .loading-logo {
+            width: 192px;
+            height: 192px;
+            margin-bottom: 32px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .loading-bar {
+            width: 300px;
+            height: 20px;
+            background: #333;
+            border: 2px solid #666;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .loading-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #0055ee 0%, #0099ff 100%);
+            width: 0%;
+            animation: loading 3s ease-in-out forwards;
+        }
+
+        @keyframes loading {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        .loading-text {
+            color: white;
+            margin-top: 16px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <svg class="loading-logo" viewBox="0 0 100 100">
+            <defs>
+                <pattern id="flagTexture" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+                    <rect width="100" height="100" fill="white" opacity="0.1"/>
+                    <circle cx="25" cy="25" r="0.5" fill="white" opacity="0.2"/>
+                    <circle cx="75" cy="75" r="0.5" fill="white" opacity="0.2"/>
+                </pattern>
+            </defs>
+            <path d="M3,3 L45,3 L45,45 L3,45 Z" fill="#f25022" stroke="white" strokeWidth="0.5"/>
+            <path d="M52,3 L97,3 L97,45 L52,45 Z" fill="#7fba00" stroke="white" strokeWidth="0.5"/>
+            <path d="M3,52 L45,52 L45,97 L3,97 Z" fill="#00a4ef" stroke="white" strokeWidth="0.5"/>
+            <path d="M52,52 L97,52 L97,97 L52,97 Z" fill="#ffb900" stroke="white" strokeWidth="0.5"/>
+            <rect x="3" y="3" width="94" height="94" fill="url(#flagTexture)" opacity="0.3"/>
+        </svg>
+        <div class="loading-bar">
+            <div class="loading-progress"></div>
+        </div>
+        <div class="loading-text">Iniciando Windows XP...</div>
+    </div>
+
+    <!-- Desktop -->
+    <div class="desktop" id="desktop">
+        <div class="desktop-icons" id="desktopIcons">
+            <!-- Desktop icons will be added here -->
+        </div>
+    </div>
+
+    <!-- Taskbar -->
+    <div class="taskbar">
+        <div class="start-button" id="startButton">
+            <span>▶</span>
+            <span>Inicio</span>
+        </div>
+        <div class="taskbar-apps" id="taskbarApps">
+            <!-- Open apps will appear here -->
+        </div>
+        <div class="system-tray">
+            <span>🔊</span>
+            <span>🌐</span>
+            <span>🔋</span>
+            <span id="clock">00:00</span>
+        </div>
+    </div>
+
+    <!-- Start Menu -->
+    <div class="start-menu" id="startMenu">
+        <div class="start-menu-header">
+            <div class="start-menu-user">👤</div>
+            <div class="start-menu-info">
+                <div>Octavio Ramirez</div>
+                <div>Portfolio XP</div>
+            </div>
+        </div>
+        <div class="start-menu-content">
+            <div class="start-menu-programs" id="startMenuPrograms">
+                <!-- Start menu items will be added here -->
+            </div>
+            <div class="start-menu-sidebar">
+                <div class="start-menu-item" onclick="shutdown()">
+                    <span>⏻️</span>
+                    <span>Apagar</span>
+                </div>
+                <div class="start-menu-item" onclick="logoff()">
+                    <span>🚪</span>
+                    <span>Cerrar sesión</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Desktop configuration
+        const desktopApps = [
+            { id: 'about', title: 'Mi Perfil', icon: '👤', row: 0, col: 0 },
+            { id: 'experience', title: 'Experiencia', icon: '💼', row: 1, col: 0 },
+            { id: 'skills', title: 'Habilidades', icon: '🛠️', row: 2, col: 0 },
+            { id: 'education', title: 'Educación', icon: '🎓', row: 3, col: 0 },
+            { id: 'contact', title: 'Contacto', icon: '📧', row: 4, col: 0 },
+            { id: 'notepad', title: 'Bloc', icon: '📝', row: 0, col: 1 },
+            { id: 'internet', title: 'Internet', icon: '🌐', row: 1, col: 1 },
+            { id: 'paint', title: 'Paint', icon: '🎨', row: 2, col: 1 },
+            { id: 'media', title: 'Media', icon: '🎵', row: 3, col: 1 },
+            { id: 'solitaire', title: 'Solitario', icon: '🃏', row: 4, col: 1 },
+            { id: 'minesweeper', title: 'Buscaminas', icon: '💣', row: 5, col: 1 },
+            { id: 'calculator', title: 'Calculadora', icon: '🔢', row: 0, col: 2 }
+        ];
+
+        const appContent = {
+            about: {
+                title: 'Mi Perfil',
+                content: `
+                    <h2>👤 Octavio Ramirez</h2>
+                    <h3>Técnico en Desarrollo de Software</h3>
+                    <p><strong>Ubicación:</strong> Argentina</p>
+                    <p><strong>Especialidad:</strong> Frontend & Backend</p>
+                    <p><strong>Experiencia:</strong> 2+ años</p>
+                    <p><strong>Tecnologías:</strong> React, Next.js, TypeScript, Node.js</p>
+                    <hr>
+                    <p>Desarrollador apasionado con experiencia en creación de aplicaciones web modernas y responsivas. Especializado en React y Next.js con conocimiento sólido de TypeScript y desarrollo full-stack.</p>
+                `
+            },
+            experience: {
+                title: 'Experiencia',
+                content: `
+                    <h2>💼 Experiencia Laboral</h2>
+                    <div style="margin: 20px 0;">
+                        <h3>Desarrollador Full Stack</h3>
+                        <p><strong>Tech Company</strong> | 2022 - Presente</p>
+                        <ul>
+                            <li>Desarrollo de aplicaciones web modernas con React y Next.js</li>
+                            <li>Implementación de APIs RESTful con Node.js</li>
+                            <li>Diseño y optimización de bases de datos</li>
+                            <li>Integración de sistemas de pago y autenticación</li>
+                        </ul>
+                    </div>
+                    <div style="margin: 20px 0;">
+                        <h3>Frontend Developer</h3>
+                        <p><strong>Startup Tech</strong> | 2021 - 2022</p>
+                        <ul>
+                            <li>Creación de interfaces de usuario responsivas</li>
+                            <li>Optimización de rendimiento web</li>
+                            <li>Implementación de diseños UX/UI</li>
+                            <li>Trabajo con metodologías ágiles</li>
+                        </ul>
+                    </div>
+                `
+            },
+            skills: {
+                title: 'Habilidades',
+                content: `
+                    <h2>🛠️ Habilidades Técnicas</h2>
+                    <div style="margin: 20px 0;">
+                        <h3>Frontend</h3>
+                        <ul>
+                            <li>React / Next.js / TypeScript</li>
+                            <li>HTML5 / CSS3 / JavaScript</li>
+                            <li>Tailwind CSS / Bootstrap</li>
+                            <li>Redux / Zustand / Context API</li>
+                        </ul>
+                    </div>
+                    <div style="margin: 20px 0;">
+                        <h3>Backend</h3>
+                        <ul>
+                            <li>Node.js / Express</li>
+                            <li>Python / Django</li>
+                            <li>PostgreSQL / MongoDB</li>
+                            <li>REST APIs / GraphQL</li>
+                        </ul>
+                    </div>
+                    <div style="margin: 20px 0;">
+                        <h3>Herramientas</h3>
+                        <ul>
+                            <li>Git / GitHub / GitLab</li>
+                            <li>Docker / Kubernetes</li>
+                            <li>AWS / Vercel</li>
+                            <li>VS Code / IntelliJ</li>
+                        </ul>
+                    </div>
+                `
+            },
+            education: {
+                title: 'Educación',
+                content: `
+                    <h2>🎓 Educación</h2>
+                    <div style="margin: 20px 0;">
+                        <h3>Técnico en Desarrollo de Software</h3>
+                        <p><strong>Instituto Tecnológico</strong> | 2019 - 2021</p>
+                        <ul>
+                            <li>Especialización en desarrollo web</li>
+                            <li>Bases de datos y sistemas</li>
+                            <li>Redes y seguridad informática</li>
+                        </ul>
+                    </div>
+                    <div style="margin: 20px 0;">
+                        <h3>Certificaciones</h3>
+                        <ul>
+                            <li>React Developer Certification</li>
+                            <li>Node.js Advanced Concepts</li>
+                            <li>Cloud Computing Fundamentals</li>
+                        </ul>
+                    </div>
+                `
+            },
+            contact: {
+                title: 'Contacto',
+                content: `
+                    <h2>📧 Contacto</h2>
+                    <div style="text-align: center; margin: 20px 0;">
+                        <div style="font-size: 48px; margin-bottom: 20px;">📧</div>
+                        <h3>Conectemos</h3>
+                        <p>¿Interesado en trabajar juntos? ¡Me encantaría saber de ti!</p>
+                    </div>
+                    <div style="margin: 20px 0;">
+                        <h3>Información de Contacto</h3>
+                        <p><strong>Email:</strong> <a href="mailto:octavio@example.com">octavio@example.com</a></p>
+                        <p><strong>LinkedIn:</strong> <a href="#" target="_blank">linkedin.com/in/octavio-ramirez</a></p>
+                        <p><strong>GitHub:</strong> <a href="#" target="_blank">github.com/octavio-ramirez</a></p>
+                        <p><strong>Teléfono:</strong> +54 9 11 1234-5678</p>
+                    </div>
+                    <div style="margin: 20px 0;">
+                        <h3>Ubicación</h3>
+                        <p>📍 Buenos Aires, Argentina</p>
+                        <p>Disponible para trabajo remoto y presencial</p>
+                    </div>
+                `
+            },
+            solitaire: {
+                title: 'Solitario',
+                content: `
+                    <h2>🃏 Solitario Windows XP</h2>
+                    <div style="text-align: center; padding: 20px;">
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; max-width: 400px; margin: 0 auto;">
+                            ${Array(8).fill().map((_, i) => 
+                                `<div style="width: 60px; height: 80px; background: white; border: 2px solid #333; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer;">
+                                    ${i < 4 ? ['🃏', '🂠', '🂮', '🃟'][i] : ''}
+                                </div>`
+                            ).join('')}
+                        </div>
+                        <p style="margin-top: 20px;">Juego clásico de Solitario de Windows XP</p>
+                        <button onclick="alert('¡Juego en desarrollo!')" style="margin-top: 10px; padding: 8px 16px; background: #4e8f2e; color: white; border: none; border-radius: 4px; cursor: pointer;">Nuevo Juego</button>
+                    </div>
+                `
+            },
+            minesweeper: {
+                title: 'Buscaminas',
+                content: `
+                    <h2>💣 Buscaminas Windows XP</h2>
+                    <div style="text-align: center; padding: 20px;">
+                        <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 2px; max-width: 300px; margin: 0 auto;">
+                            ${Array(36).fill().map((_, i) => 
+                                `<div style="width: 40px; height: 40px; background: #c0c0c0; border: 2px solid #333; border-right: #fff; border-bottom: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer;">
+                                    ${Math.random() < 0.15 ? '💣' : ''}
+                                </div>`
+                            ).join('')}
+                        </div>
+                        <p style="margin-top: 20px;">Busca las minas sin hacer clic en ellas</p>
+                        <button onclick="alert('¡Juego en desarrollo!')" style="margin-top: 10px; padding: 8px 16px; background: #4e8f2e; color: white; border: none; border-radius: 4px; cursor: pointer;">Nuevo Juego</button>
+                    </div>
+                `
+            },
+            calculator: {
+                title: 'Calculadora',
+                content: `
+                    <h2>🔢 Calculadora Windows XP</h2>
+                    <div style="max-width: 300px; margin: 0 auto;">
+                        <div style="background: #f0f0f0; border: 2px inset #c0c0c0; padding: 10px; text-align: right; font-size: 24px; font-family: monospace; margin-bottom: 10px;">0</div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px;">
+                            ${['C', '÷', '×', '−', '7', '8', '9', '+', '4', '5', '6', '=', '1', '2', '3', '0'].map(btn => 
+                                `<button style="padding: 20px; font-size: 18px; border: 2px outset #c0c0c0; background: #c0c0c0; cursor: pointer;" onmousedown="this.style.border='2px inset #c0c0c0'" onmouseup="this.style.border='2px outset #c0c0c0'">${btn}</button>`
+                            ).join('')}
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let openWindows = [];
+        let activeWindow = null;
+        let windowZIndex = 100;
+
+        // Initialize desktop
+        function initDesktop() {
+            const desktopIcons = document.getElementById('desktopIcons');
+            
+            // Create desktop icons
+            desktopApps.forEach(app => {
+                const icon = document.createElement('div');
+                icon.className = 'desktop-icon';
+                icon.style.left = `${app.col * 100 + 20}px`;
+                icon.style.top = `${app.row * 100 + 20}px`;
+                icon.innerHTML = `
+                    <div class="icon">${app.icon}</div>
+                    <div class="label">${app.title}</div>
+                `;
+                icon.onclick = () => openApp(app.id);
+                desktopIcons.appendChild(icon);
+            });
+
+            // Setup start menu
+            setupStartMenu();
+
+            // Setup clock
+            updateClock();
+            setInterval(updateClock, 1000);
+
+            // Hide loading screen
+            setTimeout(() => {
+                document.getElementById('loadingScreen').style.display = 'none';
+            }, 3000);
+        }
+
+        function setupStartMenu() {
+            const startButton = document.getElementById('startButton');
+            const startMenu = document.getElementById('startMenu');
+            const startMenuPrograms = document.getElementById('startMenuPrograms');
+
+            startButton.onclick = () => {
+                startMenu.classList.toggle('active');
+            };
+
+            // Add programs to start menu
+            desktopApps.forEach(app => {
+                const item = document.createElement('div');
+                item.className = 'start-menu-item';
+                item.innerHTML = `
+                    <span>${app.icon}</span>
+                    <span>${app.title}</span>
+                `;
+                item.onclick = () => {
+                    openApp(app.id);
+                    startMenu.classList.remove('active');
+                };
+                startMenuPrograms.appendChild(item);
+            });
+
+            // Close start menu when clicking outside
+            document.onclick = (e) => {
+                if (!startButton.contains(e.target) && !startMenu.contains(e.target)) {
+                    startMenu.classList.remove('active');
+                }
+            };
+        }
+
+        function openApp(appId) {
+            const app = desktopApps.find(a => a.id === appId);
+            if (!app) return;
+
+            // Check if window is already open
+            if (openWindows.includes(appId)) {
+                focusWindow(appId);
+                return;
+            }
+
+            // Create window
+            const window = document.createElement('div');
+            window.className = 'window active';
+            window.id = `window-${appId}`;
+            window.style.left = `${100 + openWindows.length * 30}px`;
+            window.style.top = `${100 + openWindows.length * 30}px`;
+            window.style.width = '600px';
+            window.style.height = '400px';
+            window.style.zIndex = ++windowZIndex;
+
+            const content = appContent[appId];
+            window.innerHTML = `
+                <div class="window-header" onmousedown="startDrag(event, '${appId}')">
+                    <span class="window-icon">${app.icon}</span>
+                    <span class="window-title">${content.title}</span>
+                    <div class="window-controls">
+                        <button class="window-button" onclick="minimizeWindow('${appId}')">_</button>
+                        <button class="window-button" onclick="maximizeWindow('${appId}')">□</button>
+                        <button class="window-button" onclick="closeWindow('${appId}')">×</button>
+                    </div>
+                </div>
+                <div class="window-content">
+                    ${content.content}
+                </div>
+            `;
+
+            document.getElementById('desktop').appendChild(window);
+            openWindows.push(appId);
+            activeWindow = appId;
+
+            // Add to taskbar
+            addToTaskbar(app);
+        }
+
+        function closeWindow(appId) {
+            const window = document.getElementById(`window-${appId}`);
+            if (window) {
+                window.remove();
+                openWindows = openWindows.filter(id => id !== appId);
+                removeFromTaskbar(appId);
+                if (activeWindow === appId) {
+                    activeWindow = null;
+                }
+            }
+        }
+
+        function focusWindow(appId) {
+            const window = document.getElementById(`window-${appId}`);
+            if (window) {
+                window.style.zIndex = ++windowZIndex;
+                activeWindow = appId;
+            }
+        }
+
+        function addToTaskbar(app) {
+            const taskbarApps = document.getElementById('taskbarApps');
+            const taskbarApp = document.createElement('div');
+            taskbarApp.className = 'taskbar-app active';
+            taskbarApp.id = `taskbar-${app.id}`;
+            taskbarApp.innerHTML = `
+                <span>${app.icon}</span>
+                <span>${app.title}</span>
+            `;
+            taskbarApp.onclick = () => focusWindow(app.id);
+            taskbarApps.appendChild(taskbarApp);
+        }
+
+        function removeFromTaskbar(appId) {
+            const taskbarApp = document.getElementById(`taskbar-${appId}`);
+            if (taskbarApp) {
+                taskbarApp.remove();
+            }
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const time = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('clock').textContent = time;
+        }
+
+        function shutdown() {
+            if (confirm('¿Estás seguro de que quieres apagar Windows XP?')) {
+                document.body.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100vh; background: black; color: white; font-family: Tahoma; font-size: 24px;">Apagando Windows XP...</div>';
+                setTimeout(() => {
+                    document.body.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100vh; background: black; color: white; font-family: Tahoma; font-size: 24px;">Es seguro apagar el equipo.</div>';
+                }, 2000);
+            }
+        }
+
+        function logoff() {
+            if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+                location.reload();
+            }
+        }
+
+        // Window dragging
+        let draggedWindow = null;
+        let dragOffset = { x: 0, y: 0 };
+
+        function startDrag(event, appId) {
+            draggedWindow = document.getElementById(`window-${appId}`);
+            const rect = draggedWindow.getBoundingClientRect();
+            dragOffset.x = event.clientX - rect.left;
+            dragOffset.y = event.clientY - rect.top;
+            
+            document.onmousemove = drag;
+            document.onmouseup = stopDrag;
+            event.preventDefault();
+        }
+
+        function drag(event) {
+            if (draggedWindow) {
+                draggedWindow.style.left = `${event.clientX - dragOffset.x}px`;
+                draggedWindow.style.top = `${event.clientY - dragOffset.y}px`;
+            }
+        }
+
+        function stopDrag() {
+            draggedWindow = null;
+            document.onmousemove = null;
+            document.onmouseup = null;
+        }
+
+        // Initialize when page loads
+        window.onload = initDesktop;
+    </script>
+</body>
+</html>
